@@ -1,9 +1,8 @@
 package Device
 
-// #cgo LDFLAGS 需要根据不同的平台修改 hcnetsdk（linux) / HCNETSDK(Windows)
 /*
 #cgo CFLAGS:  -I../../include
-#cgo LDFLAGS: -L$../../build  -lHCCore -lhpr -lhcnetsdk 
+#cgo LDFLAGS: -L$../../build  -lHCCore -lhpr -lhcnetsdk
 #include <stdio.h>
 #include <stdlib.h>
 #include "HCNetSDK.h"
@@ -16,6 +15,8 @@ import (
 	"log"
 	"unsafe"
 )
+
+// #cgo LDFLAGS 需要根据不同的平台修改 hcnetsdk（linux) / HCNETSDK(Windows)
 
 //export AlarmCallBack
 func AlarmCallBack(command C.LONG, alarm *C.NET_DVR_ALARMER, info *C.char, len C.DWORD, user unsafe.Pointer) {
@@ -31,19 +32,19 @@ type HKDevice struct {
 	alarmHandle int
 }
 
-//InitHikSDK hk sdk init
+// InitHikSDK hk sdk init
 func InitHikSDK() {
 	C.NET_DVR_Init()
 	C.NET_DVR_SetConnectTime(2000, 5)
 	C.NET_DVR_SetReconnect(10000, 1)
 }
 
-//HKExit hk sdk clean
+// HKExit hk sdk clean
 func HKExit() {
 	C.NET_DVR_Cleanup()
 }
 
-//NewHKDevice new hk-device instance
+// NewHKDevice new hk-device instance
 func NewHKDevice(info DeviceInfo) Device {
 	return &HKDevice{
 		ip:       info.IP,
@@ -52,7 +53,7 @@ func NewHKDevice(info DeviceInfo) Device {
 		password: info.Password}
 }
 
-//Login hk device loin
+// Login hk device loin
 func (device *HKDevice) Login() (int, error) {
 	// init data
 	var deviceInfoV30 C.NET_DVR_DEVICEINFO_V30
@@ -75,7 +76,7 @@ func (device *HKDevice) Login() (int, error) {
 	return device.loginId, nil
 }
 
-//Logout hk device logout
+// Logout hk device logout
 func (device *HKDevice) Logout() error {
 	C.NET_DVR_Logout_V30(C.LONG(device.loginId))
 	if err := device.HKErr("NVRLogout"); err != nil {
@@ -92,10 +93,10 @@ func (device *HKDevice) SetAlarmCallBack() error {
 }
 func (device *HKDevice) StartListenAlarmMsg() error {
 	var struAlarmParam C.NET_DVR_SETUPALARM_PARAM
-	struAlarmParam.dwSize = C.uint(unsafe.Sizeof(struAlarmParam)) //Windows -> C.ulong
+	struAlarmParam.dwSize = C.ulong(unsafe.Sizeof(struAlarmParam)) //Windows -> C.ulong
 	struAlarmParam.byAlarmInfoType = 0
 
-	device.alarmHandle = int(C.NET_DVR_SetupAlarmChan_V41(C.int(device.loginId), &struAlarmParam)) // Windows -> C.long
+	device.alarmHandle = int(C.NET_DVR_SetupAlarmChan_V41(C.long(device.loginId), &struAlarmParam)) // Windows -> C.long
 	if device.alarmHandle < 0 {
 		return device.HKErr("setup alarm chan")
 	}
@@ -103,13 +104,13 @@ func (device *HKDevice) StartListenAlarmMsg() error {
 }
 
 func (device *HKDevice) StopListenAlarmMsg() error {
-	if C.NET_DVR_CloseAlarmChan_V30(C.int(device.alarmHandle)) != C.TRUE { //Windows  C.long
+	if C.NET_DVR_CloseAlarmChan_V30(C.long(device.alarmHandle)) != C.TRUE { //Windows  C.long
 		return device.HKErr("stoop alarm chan")
 	}
 	return nil
 }
 
-//HKErr Detect success of operation
+// HKErr Detect success of operation
 func (device *HKDevice) HKErr(operation string) error {
 	errno := int64(C.NET_DVR_GetLastError())
 	if errno > 0 {
