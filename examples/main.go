@@ -1,11 +1,11 @@
 package main
 
 /*
-#cgo CFLAGS:  -I./include
+#cgo CFLAGS:  -I../include
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "HCNetSDK.h"
+#include "../HCNetSDK.h"
 */
 import "C"
 import (
@@ -16,10 +16,11 @@ import (
 
 	"github.com/pkg/errors"
 )
-# 参考链接示例，比较粗糙，没有仔细修改，仅供大家参考
-# 1.云台控制
-# 2.抓图
-# 3.视频播放
+
+//# 参考链接示例，比较粗糙，没有仔细修改，仅供大家参考
+//# 1.云台控制
+//# 2.抓图
+//# 3.视频播放
 
 // 是否有错误
 func isErr(oper string) error {
