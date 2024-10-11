@@ -11,8 +11,9 @@ type Device interface {
 	// Play 播放视频
 	Play() (int64, error)
 	// Capture 抓图
-	Capture() (string, error)
+	Capture(filepath string) error
 }
+
 type DeviceInfo struct {
 	IP       string
 	Port     int

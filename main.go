@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"runtime"
+	"time"
 )
 
 func init() {
@@ -36,10 +37,11 @@ func main() {
 		log.Printf("成功播放, id=%d\n", id)
 	}
 
-	if path, err := device.Capture(); err != nil {
+	filepath := time.Now().Format("20060102150405") + ".jpeg"
+	if err := device.Capture(filepath); err != nil {
 		log.Fatal("抓拍失败", err.Error())
 	} else {
-		log.Printf("成功抓拍, 图片地址=%s\n", path)
+		log.Printf("成功抓拍, 图片地址=%s\n", filepath)
 	}
 
 	// device.SetAlarmCallBack()

@@ -13,7 +13,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"time"
 	"unsafe"
 )
 
@@ -51,7 +50,8 @@ func NewHKDevice(info DeviceInfo) Device {
 		ip:       info.IP,
 		port:     info.Port,
 		username: info.UserName,
-		password: info.Password}
+		password: info.Password,
+	}
 }
 
 // Login hk device loin
@@ -131,12 +131,10 @@ func (device *HKDevice) Play() (int64, error) {
 }
 
 // Capture 抓拍
-func (device *HKDevice) Capture() (string, error) {
-	picPath := time.Now().Format("20060102150405") + ".jpeg"
-
+func (device *HKDevice) Capture(filepath string) error {
 	var jpegpara C.NET_DVR_JPEGPARA
 	var lChannel uint32 = 1
-	c_path := C.CString(picPath)
+	c_path := C.CString(filepath)
 	defer C.free(unsafe.Pointer(c_path))
 	msgId := C.NET_DVR_CaptureJPEGPicture(C.LONG(device.loginId), C.LONG(lChannel),
 		(*C.NET_DVR_JPEGPARA)(unsafe.Pointer(&jpegpara)),
@@ -145,11 +143,11 @@ func (device *HKDevice) Capture() (string, error) {
 
 	if int64(msgId) < 0 {
 		if err := isErr("Capture"); err != nil {
-			return "", err
+			return err
 		}
-		return "", errors.New("抓拍失败")
+		return errors.New("抓拍失败")
 	}
-	return picPath, nil
+	return nil
 }
 
 // 是否有错误

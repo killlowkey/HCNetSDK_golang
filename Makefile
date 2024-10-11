@@ -15,4 +15,5 @@ windows: clean
 
 clean:
 	rm -r build
+	rm *.jpeg
 
