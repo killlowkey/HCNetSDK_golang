@@ -14,6 +14,6 @@ windows: clean
 	build/hik.exe
 
 clean:
-	rm -r build
-	rm *.jpeg
+	rm -rf build
+	rm -rf *.jpeg
 

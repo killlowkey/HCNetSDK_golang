@@ -10,7 +10,6 @@ extern void AlarmCallBack(LONG lCommand, NET_DVR_ALARMER *pAlarmer, char *pAlarm
 */
 import "C"
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"unsafe"
@@ -174,7 +173,7 @@ func (device *HKDevice) HKErr(operation string) error {
 func (n *NET_DVR_DEVICEINFO_V30) Convert(cStruct C.NET_DVR_DEVICEINFO_V30) {
 	// 复制设备地址
 	serialNumber := C.GoBytes(unsafe.Pointer(&cStruct.sSerialNumber), C.int(len(cStruct.sSerialNumber)))
-	n.SSerialNumber = string(bytes.Trim(serialNumber, "\x00"))
+	n.SSerialNumber = string(serialNumber)
 	n.ByAlarmInPortNum = *(*byte)(unsafe.Pointer(&cStruct.byAlarmInPortNum))
 	n.ByAlarmOutPortNum = *(*byte)(unsafe.Pointer(&cStruct.byAlarmOutPortNum))
 	n.ByDiskNum = *(*byte)(unsafe.Pointer(&cStruct.byDiskNum))
