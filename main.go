@@ -2,9 +2,7 @@ package main
 
 import (
 	"alarm/internal/Device"
-	"fmt"
 	"log"
-	"runtime"
 	"time"
 )
 
@@ -13,7 +11,6 @@ func init() {
 }
 
 func main() {
-	fmt.Println(runtime.GOOS)
 	info := Device.DeviceInfo{
 		IP:       "172.16.19.3",
 		UserName: "admin",
