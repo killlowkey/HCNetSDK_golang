@@ -10,9 +10,11 @@ extern void AlarmCallBack(LONG lCommand, NET_DVR_ALARMER *pAlarmer, char *pAlarm
 */
 import "C"
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"log"
+	"time"
 	"unsafe"
 )
 
@@ -72,6 +74,10 @@ func (device *HKDevice) Login() (int, error) {
 	if device.loginId < 0 {
 		return -1, device.HKErr("login ")
 	}
+
+	serialNumber := C.GoBytes(unsafe.Pointer(&deviceInfoV30.sSerialNumber), C.int(len(deviceInfoV30.sSerialNumber)))
+	trimmedSerialNumber := bytes.Trim(serialNumber, "\x00")
+	log.Println("设备 id", string(trimmedSerialNumber))
 	log.Println("login success")
 	return device.loginId, nil
 }
@@ -106,6 +112,55 @@ func (device *HKDevice) StartListenAlarmMsg() error {
 func (device *HKDevice) StopListenAlarmMsg() error {
 	if C.NET_DVR_CloseAlarmChan_V30(C.long(device.alarmHandle)) != C.TRUE { //Windows  C.long
 		return device.HKErr("stoop alarm chan")
+	}
+	return nil
+}
+
+// Play 播放视频
+// uid:摄像头登录成功的id
+// 返回播放视频标识 pid
+func (device *HKDevice) Play() (int64, error) {
+	var pDetectInfo C.NET_DVR_CLIENTINFO
+	pDetectInfo.lChannel = C.LONG(1)
+	pid := C.NET_DVR_RealPlay_V30(C.LONG(device.loginId), (*C.NET_DVR_CLIENTINFO)(unsafe.Pointer(&pDetectInfo)), nil, nil, C.BOOL(1))
+	if int64(pid) < 0 {
+		if err := isErr("Play"); err != nil {
+			return -1, err
+		}
+		return -1, errors.New("播放失败")
+	}
+
+	return int64(pid), nil
+}
+
+// Capture 抓拍
+func (device *HKDevice) Capture() (string, error) {
+	picPath := time.Now().Format("20060102150405") + ".jpeg"
+
+	var jpegpara C.NET_DVR_JPEGPARA
+	var lChannel uint32 = 1
+	c_path := C.CString(picPath)
+	defer C.free(unsafe.Pointer(c_path))
+	msgId := C.NET_DVR_CaptureJPEGPicture(C.LONG(device.loginId), C.LONG(lChannel),
+		(*C.NET_DVR_JPEGPARA)(unsafe.Pointer(&jpegpara)),
+		c_path,
+	)
+
+	if int64(msgId) < 0 {
+		if err := isErr("Capture"); err != nil {
+			return "", err
+		}
+		return "", errors.New("抓拍失败")
+	}
+	return picPath, nil
+}
+
+// 是否有错误
+func isErr(oper string) error {
+	errno := int64(C.NET_DVR_GetLastError())
+	if errno > 0 {
+		reMsg := fmt.Sprintf("%s摄像头失败,失败代码号：%d", oper, errno)
+		return errors.New(reMsg)
 	}
 	return nil
 }

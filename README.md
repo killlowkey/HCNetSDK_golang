@@ -23,24 +23,15 @@
 3. 视频预览，目前只是正常调用sdk，未进行界面视频预览，这里只是进行接口调用验证，实际业务场景还是建议走`http+StreamServer`,如c++的有`SRS`，golang有`lal`、`monibuca`
 
 ## 使用说明
+windows 平台用git bash 终端，不要用ide的终端
+```shell
+make windows
+```
 
-makefile编译
+```shell
+make linux
+```
 
-    ```shell
-    Windows: # 用git bash 终端，不要用ide的终端
-    mingw32-make.exe windows
-    Linux:
-    make linux
-    ```
-
-    清除
-
-    ```shell
-    Windows:
-    mingw32-make.exe clean
-    Linux:
-    make clean
-    ```
 ## 联系方式
 
 * https://www.cnblogs.com/erfeng/

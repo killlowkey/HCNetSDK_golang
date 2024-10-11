@@ -6,6 +6,8 @@ type Device interface {
 	SetAlarmCallBack() error
 	StartListenAlarmMsg() error
 	StopListenAlarmMsg() error
+	Play() (int64, error)
+	Capture() (string, error)
 }
 type DeviceInfo struct {
 	IP       string
