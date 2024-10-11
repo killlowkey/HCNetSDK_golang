@@ -12,6 +12,8 @@ import "C"
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"unsafe"
 )
 
@@ -130,14 +132,21 @@ func (device *HKDevice) Play() (int64, error) {
 }
 
 // Capture 抓拍
-func (device *HKDevice) Capture(filepath string) error {
-	var jpegpara C.NET_DVR_JPEGPARA
-	var lChannel uint32 = 1
-	c_path := C.CString(filepath)
-	defer C.free(unsafe.Pointer(c_path))
+func (device *HKDevice) Capture(imageFilepath string) error {
+	if err := createDirs(imageFilepath); err != nil {
+		return err
+	}
+
+	var (
+		jpegPara       C.NET_DVR_JPEGPARA
+		lChannel       uint32 = 1
+		cImageFilepath        = C.CString(imageFilepath)
+	)
+
+	defer C.free(unsafe.Pointer(cImageFilepath))
 	msgId := C.NET_DVR_CaptureJPEGPicture(C.LONG(device.loginId), C.LONG(lChannel),
-		(*C.NET_DVR_JPEGPARA)(unsafe.Pointer(&jpegpara)),
-		c_path,
+		(*C.NET_DVR_JPEGPARA)(unsafe.Pointer(&jpegPara)),
+		cImageFilepath,
 	)
 
 	if int64(msgId) < 0 {
@@ -146,6 +155,7 @@ func (device *HKDevice) Capture(filepath string) error {
 		}
 		return errors.New("抓拍失败")
 	}
+
 	return nil
 }
 
@@ -169,7 +179,19 @@ func (device *HKDevice) HKErr(operation string) error {
 	return nil
 }
 
-// CToGo 将C结构体转换为Go结构体
+func createDirs(path string) error {
+	// 获取文件所在的目录
+	dir := filepath.Dir(path)
+
+	// 创建所有必要的目录
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("创建目录失败: %v", err)
+	}
+
+	return nil
+}
+
+// Convert 将C结构体转换为Go结构体
 func (n *NET_DVR_DEVICEINFO_V30) Convert(cStruct C.NET_DVR_DEVICEINFO_V30) {
 	// 复制设备地址
 	serialNumber := C.GoBytes(unsafe.Pointer(&cStruct.sSerialNumber), C.int(len(cStruct.sSerialNumber)))

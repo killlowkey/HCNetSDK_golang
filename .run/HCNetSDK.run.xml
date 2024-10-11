@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="true" name="HCNetSDK" type="GoApplicationRunConfiguration" factoryName="Go Application"
+                   nameIsGenerated="true">
+        <module name="HCNetSDK_golang"/>
+        <working_directory value="$PROJECT_DIR$"/>
+        <envs>
+            <env name="CGO_ENABLED" value="1"/>
+            <env name="CGO_CFLAGS" value="-I$PROJECT_DIR$/include "/>
+            <env name="CGO_LDFLAGS" value="-L$PROJECT_DIR$/build -lHCNetSDK -lHCCore"/>
+        </envs>
+        <kind value="PACKAGE"/>
+        <package value="alarm"/>
+        <directory value="$PROJECT_DIR$"/>
+        <filePath value="$PROJECT_DIR$/main.go"/>
+        <output_directory value="$PROJECT_DIR$/build"/>
+        <method v="2"/>
+    </configuration>
+</component>

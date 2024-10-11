@@ -3,13 +3,19 @@ package Device
 type Device interface {
 	// Login 登录
 	Login() (int, *NET_DVR_DEVICEINFO_V30, error)
+
 	// Logout 注销
 	Logout() error
+
 	SetAlarmCallBack() error
+
 	StartListenAlarmMsg() error
+
 	StopListenAlarmMsg() error
+
 	// Play 播放视频
 	Play() (int64, error)
+
 	// Capture 抓图
 	Capture(filepath string) error
 }

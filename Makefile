@@ -3,6 +3,12 @@ export WDIR=${PWD}
 
 all: linux windows
 
+windows_ide: clean
+	cp -r lib/Windows/ build/
+
+linux_ide: clean
+	cp -r lib/Linux/ build/
+
 linux: clean
 	cp -r lib/Linux/ build/ 
 	GOOS=linux  CGO_CFLAGS="-I${WDIR}/include"  CGO_LDFLAGS="-L${WDIR}/build -Wl,-rpath=${WDIR}/build -lhcnetsdk" go build -ldflags "-s -w" -o build/hik main.go
@@ -15,5 +21,4 @@ windows: clean
 
 clean:
 	rm -rf build
-	rm -rf *.jpeg
 

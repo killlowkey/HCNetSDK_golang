@@ -21,13 +21,13 @@ func main() {
 		Port:     8000,
 	}
 	device := Device.NewHKDevice(info)
-	if userId, info, err := device.Login(); err != nil {
+	if userId, deviceInfo, err := device.Login(); err != nil {
 		log.Fatal("登录失败", err.Error())
 	} else {
-		log.Printf("成功登录，用户id=%d, 设备信息=%v\n", userId, info)
+		log.Printf("成功登录，用户id=%d, 设备信息=%v\n", userId, deviceInfo)
 	}
 	defer func() {
-		device.Logout()
+		_ = device.Logout()
 		Device.HKExit()
 	}()
 
@@ -37,7 +37,7 @@ func main() {
 		log.Printf("成功播放, id=%d\n", id)
 	}
 
-	filepath := time.Now().Format("20060102150405") + ".jpeg"
+	filepath := "./images/" + time.Now().Format("20060102150405") + ".jpeg"
 	if err := device.Capture(filepath); err != nil {
 		log.Fatal("抓拍失败", err.Error())
 	} else {
