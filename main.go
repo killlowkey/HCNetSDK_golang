@@ -20,10 +20,10 @@ func main() {
 		Port:     8000,
 	}
 	device := Device.NewHKDevice(info)
-	if userId, err := device.Login(); err != nil {
+	if userId, info, err := device.Login(); err != nil {
 		log.Fatal("登录失败", err.Error())
 	} else {
-		log.Printf("成功登录，用户id=%d\n", userId)
+		log.Printf("成功登录，用户id=%d, 设备信息=%v\n", userId, info)
 	}
 	defer func() {
 		device.Logout()
